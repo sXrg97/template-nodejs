@@ -1,13 +1,41 @@
 const express = require('express');
 const app = express();
-const port = process.env.PORT ?? 3000;
+const http = require('http')
+const { Server } = require('socket.io')
 
-app.use(express.static('public'))
 
-app.get('*', (req, res) => {
-    res.redirect('/');
+const server = http.createServer();
+const io = new Server(server, {
+    cors: {
+        origin: '*',
+    }
+});
+
+
+io.on('connection', (socket) => {
+    console.log('a user has connected');
+
+
+    socket.on('call-for-waiter', () => {
+        io.emit('call-for-waiter-called');
+    })
+
+    socket.on('waiter-on-the-way', (data) => {
+        io.emit("waiter-on-the-way-notification", data);
+        console.log("emitting notification")
+        io.emit('call-for-waiter-called');
+    })
+
+
+    socket.on('disconnect', () => {
+        console.log('a user has disconnected');
+    }
+    )
+
 })
 
-app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
+
+const port = process.env.PORT || 3001;
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
 })
