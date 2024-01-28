@@ -26,6 +26,16 @@ io.on('connection', (socket) => {
         io.emit('call-for-waiter-called');
     })
 
+    socket.on('request-bill', () => {
+        io.emit('request-bill-called');
+    })
+
+    socket.on('bill-on-the-way', (data) => {
+        io.emit("bill-on-the-way-notification", data);
+        console.log("emitting notification")
+        io.emit('request-bill-called');
+    })
+
 
     socket.on('disconnect', () => {
         console.log('a user has disconnected');
